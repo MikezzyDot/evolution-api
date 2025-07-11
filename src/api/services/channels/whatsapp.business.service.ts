@@ -192,7 +192,18 @@ export class BusinessStartupService extends ChannelStartupService {
 
   private messageInteractiveJson(received: any) {
     const message = received.messages[0];
-    let content: any = { conversation: message.interactive[message.interactive.type].title };
+    let result: string = `${message.interactive[message.interactive.type].title}`;
+    if (message.interactive[message.interactive.type].description) {
+      result += `\n${message.interactive[message.interactive.type].description}`;
+    } 
+    let content: any = { conversation: result, id: message.interactive[message.interactive.type].id};
+    message.context ? (content = { ...content, contextInfo: { stanzaId: message.context.id } }) : content;
+    return content;
+  }
+
+  private messageInteractiveTemplateJson(received: any) {
+    const message = received.messages[0];
+    let content: any = { conversation: message[message.type].text };
     message.context ? (content = { ...content, contextInfo: { stanzaId: message.context.id } }) : content;
     return content;
   }
@@ -356,7 +367,7 @@ export class BusinessStartupService extends ChannelStartupService {
             message: {
               ...this.messageInteractiveJson(received),
             },
-            messageType: 'conversation',
+            messageType: received.messages[0].interactive.type,
             messageTimestamp: received.messages[0].timestamp as number,
             owner: this.instance.name,
             // source: getDevice(received.key.id),
@@ -369,6 +380,18 @@ export class BusinessStartupService extends ChannelStartupService {
               ...this.messageReactionJson(received),
             },
             messageType: 'reactionMessage',
+            messageTimestamp: received.messages[0].timestamp as number,
+            owner: this.instance.name,
+            // source: getDevice(received.key.id),
+          };
+        } else if (received?.messages[0].type === "button") {
+          messageRaw = {
+            key,
+            pushName,
+            message: {
+              ...this.messageInteractiveTemplateJson(received),
+            },
+            messageType: 'conversation',
             messageTimestamp: received.messages[0].timestamp as number,
             owner: this.instance.name,
             // source: getDevice(received.key.id),
@@ -742,10 +765,10 @@ export class BusinessStartupService extends ChannelStartupService {
             [message['mediaType']]: {
               [message['type']]: message['id'],
               preview_url: linkPreview,
-              caption: message['caption'],
-              filename: message['fileName'],
+              caption: message['caption']
             },
           };
+          message['fileName'] ? content[message['mediaType']].filename = message['fileName']: content;
           quoted ? (content.context = { message_id: quoted.id }) : content;
           return await this.post(content, 'messages');
         }
@@ -780,12 +803,19 @@ export class BusinessStartupService extends ChannelStartupService {
               },
             },
           };
+          message['title'] ? (content.interactive.header = {
+            "type":"text",
+            "text": message['title']
+          }): content;
+          message['footer'] ? (content.interactive.footer = {
+            "text": message['footer']
+          }): content;
           quoted ? (content.context = { message_id: quoted.id }) : content;
           let formattedText = '';
           for (const item of message['buttons']) {
-            formattedText += `▶️ ${item.reply?.title}\n`;
+            formattedText += `- ${item.reply?.title}\n`;
           }
-          message = { conversation: `${message['text'] || 'Select'}\n` + formattedText };
+          message = { conversation: `${message['title']}\n${message['text'] || 'Select'}\n${message['footer']}\n` + formattedText };
           return await this.post(content, 'messages');
         }
         if (message['sections']) {
@@ -816,12 +846,15 @@ export class BusinessStartupService extends ChannelStartupService {
           quoted ? (content.context = { message_id: quoted.id }) : content;
           let formattedText = '';
           for (const section of message['sections']) {
-            formattedText += `${section?.title}\n`;
+            formattedText += `- ${section?.title}:\n`;
+            let index = 1;
             for (const row of section.rows) {
-              formattedText += `${row?.title}\n`;
+              formattedText += `\t- [${index}] ${row?.title}:\n`;
+              formattedText += `\t\t${row?.description}\n`;
+              index += 1;
             }
           }
-          message = { conversation: `${message['title']}\n` + formattedText };
+          message = { conversation: `${message['title']}\n${message['text']}\n\t${message['footerText']}\n` + formattedText };
           return await this.post(content, 'messages');
         }
         if (message['template']) {
@@ -933,20 +966,20 @@ export class BusinessStartupService extends ChannelStartupService {
         mediaMessage.fileName = arrayMatch[1];
         this.logger.verbose('File name: ' + mediaMessage.fileName);
       }
+      // only documents accept filename in META
+      // if (mediaMessage.mediatype === 'image' && !mediaMessage.fileName) {
+      //   mediaMessage.fileName = 'image.png';
+      // }
 
-      if (mediaMessage.mediatype === 'image' && !mediaMessage.fileName) {
-        mediaMessage.fileName = 'image.png';
-      }
-
-      if (mediaMessage.mediatype === 'video' && !mediaMessage.fileName) {
-        mediaMessage.fileName = 'video.mp4';
-      }
+      // if (mediaMessage.mediatype === 'video' && !mediaMessage.fileName) {
+      //   mediaMessage.fileName = 'video.mp4';
+      // }
 
       let mimetype: string;
 
       const prepareMedia: any = {
         caption: mediaMessage?.caption,
-        fileName: mediaMessage.fileName,
+        fileName: mediaMessage?.fileName,
         mediaType: mediaMessage.mediatype,
         media: mediaMessage.media,
         gifPlayback: false,
@@ -1048,7 +1081,9 @@ export class BusinessStartupService extends ChannelStartupService {
     return await this.sendMessageWithTyping(
       data.number,
       {
-        text: !embeddedMedia?.mediaKey ? data.buttonMessage.title : undefined,
+        title: data.buttonMessage?.title,
+        text: !embeddedMedia?.mediaKey ? data.buttonMessage.description : undefined,
+        footer: data.buttonMessage?.footerText,
         buttons: data.buttonMessage.buttons.map((button) => {
           return {
             type: 'reply',
