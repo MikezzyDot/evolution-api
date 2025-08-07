@@ -75,12 +75,12 @@ export class BusinessStartupService extends ChannelStartupService {
 		await this.closeClient();
 	}
 
-	private async post(message: any, params: string) {
+	private async post(message: any, params: string, override_version: boolean = false) {
 		try {
 			const integration = await this.findIntegration();
 
 			let urlServer = this.configService.get<WaBusiness>('WA_BUSINESS').URL;
-			const version = this.configService.get<WaBusiness>('WA_BUSINESS').VERSION;
+			const version = override_version ? "v23.0" : this.configService.get<WaBusiness>('WA_BUSINESS').VERSION;
 			urlServer = `${urlServer}/${version}/${integration.number}/${params}`;
 			const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${integration.token}` };
 			const result = await axios.post(urlServer, message, { headers });
@@ -860,7 +860,7 @@ export class BusinessStartupService extends ChannelStartupService {
 					return await this.post(content, 'messages');
 				}
 				if (message['metaCustom']) {
-					this.logger.verbose('Sending message');
+					this.logger.verbose('Sending custom meta message method with typing');
 					content = {
 						messaging_product: 'whatsapp',
 						recipient_type: 'individual',
@@ -871,7 +871,7 @@ export class BusinessStartupService extends ChannelStartupService {
 					quoted ? (content.context = { message_id: quoted.id }) : content;
 					message = { conversation: message["formattedMessage"] };
 					metaCustom = true
-					return await this.post(content, 'messages');
+					return await this.post(content, 'messages', true);
 				}
 				if (message['template']) {
 					this.logger.verbose('Sending message');
