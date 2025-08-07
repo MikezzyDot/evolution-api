@@ -86,9 +86,9 @@ export class BusinessStartupService extends ChannelStartupService {
 			const result = await axios.post(urlServer, message, { headers });
 			this.logger.info("META REQUEST")
 			this.logger.info(`URL ${urlServer}`)
-			this.logger.info(`BODY ${message}`)
+			this.logger.info(`BODY ${JSON.stringify(message, null, 4)}`)
 			const data = result.data
-			this.logger.info(`DATA RESPONSE: ${data}`)
+			this.logger.info(`DATA RESPONSE: ${JSON.stringify(data, null, 4)}`)
 			this.logger.info(`END META REQUEST`)
 			return data;
 		} catch (e) {
