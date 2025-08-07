@@ -84,7 +84,13 @@ export class BusinessStartupService extends ChannelStartupService {
 			urlServer = `${urlServer}/${version}/${integration.number}/${params}`;
 			const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${integration.token}` };
 			const result = await axios.post(urlServer, message, { headers });
-			return result.data;
+			this.logger.info("META REQUEST")
+			this.logger.info(`URL ${urlServer}`)
+			this.logger.info(`BODY ${message}`)
+			const data = result.data
+			this.logger.info(`DATA RESPONSE: ${data}`)
+			this.logger.info(`END META REQUEST`)
+			return data;
 		} catch (e) {
 			this.logger.error(e);
 			return e.response.data;
