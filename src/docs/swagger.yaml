@@ -9,18 +9,18 @@ info:
 
     [![Whatsapp Group](https://img.shields.io/badge/Group-WhatsApp-%2322BC18)](https://evolution-api.com/whatsapp)
     [![Discord Community](https://img.shields.io/badge/Discord-Community-blue)](https://evolution-api.com/discord)
-    [![Postman Collection](https://img.shields.io/badge/Postman-Collection-orange)](https://evolution-api.com/postman) 
+    [![Postman Collection](https://img.shields.io/badge/Postman-Collection-orange)](https://evolution-api.com/postman)
     [![Documentation](https://img.shields.io/badge/Documentation-Official-green)](https://doc.evolution-api.com)
     [![License](https://img.shields.io/badge/license-GPL--3.0-orange)](./LICENSE)
     [![Support](https://img.shields.io/badge/Donation-picpay-green)](https://app.picpay.com/user/davidsongomes1998)
     [![Support](https://img.shields.io/badge/Buy%20me-coffe-orange)](https://bmc.link/evolutionapi)
 
     </div>
-      
+
     <div align="center"><img src="https://raw.githubusercontent.com/EvolutionAPI/evolution-api/main/public/images/cover.png"></div>
 
     <font size='3'>
-      This project is based on the [evolution](https://github.com/code-chat-br/whatsapp-api). The original project is an implementation of [Baileys](https://github.com/WhiskeySockets/Baileys), serving as a Restful API service that controls WhatsApp functions.</br> 
+      This project is based on the [evolution](https://github.com/code-chat-br/whatsapp-api). The original project is an implementation of [Baileys](https://github.com/WhiskeySockets/Baileys), serving as a Restful API service that controls WhatsApp functions.</br>
       The code allows the creation of multiservice chats, service bots, or any other system that utilizes WhatsApp. The documentation provides instructions on how to set up and use the project, as well as additional information about its features and configuration options.
     </font>
 
@@ -322,6 +322,107 @@ paths:
           description: Successful response
           content:
             application/json: {}
+
+  /message/sendCustomMeta/{instanceName}:
+    post:
+      tags:
+        - Send Custom Meta Object Controller
+      summary: Send a Meta Object for Dynamic information.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                number:
+                  type: string
+                  description: The recipient's phone number.
+                  example: "1234567890"
+                metaCustom:
+                  type: string
+                  description: Any string is required here for data control.
+                  example: "1234567890"
+                metaType:
+                  type: string
+                  description: Type to be sent in meta message.
+                  example: "interactive"
+                metaObjectType:
+                  type: string
+                  description: Type of the object to be sent in Meta request (name of the object)
+                  example: "interactive"
+                metaObject:
+                  type: object
+                  description: Object to send to META
+                formattedMessage:
+                  type: string
+                  description: Message to be saved in DB / Chatwoot and other mediums (will be saved as conversation with this content)
+                options:
+                  type: object
+                  properties:
+                    delay:
+                      type: integer
+                      description: Delay time before sending the message.
+                    presence:
+                      type: string
+                      enum: ["composing", "recording", "paused"]
+                      description: Indicates the sender's action/status.
+                    linkPreview:
+                      type: boolean
+                      description: Indicates whether to enable link preview.
+                    quoted:
+                      type: object
+                      properties:
+                        key:
+                          type: object
+                          properties:
+                            remoteJid:
+                              type: string
+                              description: The ID of the recipient of the original message.
+                            fromMe:
+                              type: boolean
+                              description: Indicates if the message was sent from the user.
+                            id:
+                              type: string
+                              description: The ID of the original message.
+                        message:
+                          type: object
+                          properties:
+                            conversation:
+                              type: string
+                              description: The content of the quoted message.
+                    mentions:
+                      type: object
+                      properties:
+                        everyone:
+                          type: boolean
+                          description: Indicates whether to mention everyone.
+                        mentioned:
+                          type: array
+                          items:
+                            type: string
+                            description: The phone numbers of the users to be mentioned.
+              required:
+                - number
+                - metaCustom
+                - metaType
+                - metaObjectType
+                - metaObject
+                - formattedMessage
+      parameters:
+        - name: instanceName
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The name of the instance to which the message should be sent.
+          example: "evolution"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json: {}
+            
   /message/sendStatus/{instanceName}:
     post:
       tags:
@@ -1008,7 +1109,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
-            
+
   /chat/whatsappNumbers/{instanceName}:
     post:
       tags:
