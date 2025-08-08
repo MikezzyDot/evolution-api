@@ -211,8 +211,7 @@ export class BusinessStartupService extends ChannelStartupService {
 	private messageInteractiveTemplateJson(received: any) {
 		const message = received.messages[0];
 		let content: any = {
-			conversation: `${message[message.type].text} ${message[message.type].payload ? `[${message[message.type].payload}]` : ""}`,
-			text: message[message.type].text,
+			conversation: message[message.type].text,
 			payload: message[message.type].payload,
 		};
 		message.context ? (content = { ...content, contextInfo: { stanzaId: message.context.id } }) : content;
