@@ -370,6 +370,23 @@ export class BusinessStartupService extends ChannelStartupService {
 						owner: this.instance.name,
 						// source: getDevice(received.key.id),
 					};
+				} else if (received ?.messages[0].interactive && received ?.messages[0].interactive.type === "nfm_reply") {
+					const flow_response: any = received ?.messages[0].interactive.nfm_reply
+					messageRaw = {
+						key,
+						pushName,
+						message: {
+							conversation: flow_response.body,
+							message_data: {
+								type: "flow",
+								payload: JSON.parse(flow_response.response_json)
+							}
+						},
+						messageType: received.messages[0].interactive.type,
+						messageTimestamp: received.messages[0].timestamp as number,
+						owner: this.instance.name,
+						// source: getDevice(received.key.id),
+					};
 				} else if (received ?.messages[0].interactive) {
 					messageRaw = {
 						key,
