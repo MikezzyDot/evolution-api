@@ -895,7 +895,13 @@ export class BusinessStartupService extends ChannelStartupService {
 						[message["metaObjectType"]]: message["metaObject"]
 					};
 					quoted ? (content.context = { message_id: quoted.id }) : content;
-					message = { conversation: message["formattedMessage"] };
+					message = {
+						conversation: message["formattedMessage"],
+						meta_custom: {
+							type: message["metaType"],
+							[message["metaObjectType"]]: message["metaObject"]
+						}
+					};
 					metaCustom = true
 					return await this.post(content, 'messages', true);
 				}
