@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { arrayUnique, isURL } from 'class-validator';
+import { arrayUnique, isBase64, isURL } from 'class-validator';
 import EventEmitter2 from 'eventemitter2';
 import FormData from 'form-data';
 import fs from 'fs/promises';
@@ -985,7 +985,9 @@ export class BusinessStartupService extends ChannelStartupService {
 
 		const formData = new FormData();
 
-		const fileBuffer = await fs.readFile(mediaMessage.media);
+		const fileBuffer = isBase64(mediaMessage.media)
+			? Buffer.from(mediaMessage.media, 'base64')
+			: await fs.readFile(mediaMessage.media);
 
 		const fileBlob = new Blob([fileBuffer], { type: mediaMessage.mimetype });
 		formData.append('file', fileBlob);
