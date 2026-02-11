@@ -989,8 +989,10 @@ export class BusinessStartupService extends ChannelStartupService {
 			? Buffer.from(mediaMessage.media, 'base64')
 			: await fs.readFile(mediaMessage.media);
 
-		const fileBlob = new Blob([fileBuffer], { type: mediaMessage.mimetype });
-		formData.append('file', fileBlob);
+		formData.append('file', fileBuffer, {
+			filename: mediaMessage.fileName || 'media',
+			contentType: mediaMessage.mimetype,
+		});
 		formData.append('typeFile', mediaMessage.mimetype);
 		formData.append('messaging_product', 'whatsapp');
 		const headers = { Authorization: `Bearer ${integration.token}` };
