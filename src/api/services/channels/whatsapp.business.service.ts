@@ -63,10 +63,10 @@ export class BusinessStartupService extends ChannelStartupService {
 		this.logger.verbose('Getting qrcode');
 
 		return {
-			pairingCode: this.instance.qrcode ?.pairingCode,
-			code: this.instance.qrcode ?.code,
-			base64: this.instance.qrcode ?.base64,
-			count: this.instance.qrcode ?.count,
+			pairingCode: this.instance.qrcode?.pairingCode,
+			code: this.instance.qrcode?.code,
+			base64: this.instance.qrcode?.base64,
+			count: this.instance.qrcode?.count,
 		};
 	}
 
@@ -164,11 +164,11 @@ export class BusinessStartupService extends ChannelStartupService {
 			this.logger.verbose('Socket event handler initialized');
 
 			this.phoneNumber = this.createJid(
-				content.messages ? content.messages[0].from : content.statuses[0] ?.recipient_id,
+				content.messages ? content.messages[0].from : content.statuses[0]?.recipient_id,
 			);
 		} catch (error) {
 			this.logger.error(error);
-			throw new InternalServerErrorException(error ?.toString());
+			throw new InternalServerErrorException(error?.toString());
 		}
 	}
 
@@ -274,13 +274,13 @@ export class BusinessStartupService extends ChannelStartupService {
 				result += `URL:${contact.urls[0].url}\n`;
 			}
 
-			if (!contact.phones[0] ?.wa_id) {
+			if (!contact.phones[0]?.wa_id) {
 				this.logger.verbose('Wuid defined');
 				contact.phones[0].wa_id = this.createJid(contact.phones[0].phone);
 			}
 
 			result +=
-				`item1.TEL;waid=${contact.phones[0] ?.wa_id}:${contact.phones[0].phone}\n` +
+				`item1.TEL;waid=${contact.phones[0]?.wa_id}:${contact.phones[0].phone}\n` +
 				'item1.X-ABLabel:Celular\n' +
 				'END:VCARD';
 
@@ -352,12 +352,12 @@ export class BusinessStartupService extends ChannelStartupService {
 					fromMe: received.messages[0].from === received.metadata.phone_number_id,
 				};
 				if (
-					received ?.messages[0].document ||
-						received ?.messages[0].image ||
-							received ?.messages[0].audio ||
-								received ?.messages[0].video
-        ) {
-					const buffer = await this.downloadMediaMessage(received ?.messages[0]);
+					received?.messages[0].document ||
+					received?.messages[0].image ||
+					received?.messages[0].audio ||
+					received?.messages[0].video
+				) {
+					const buffer = await this.downloadMediaMessage(received?.messages[0]);
 					messageRaw = {
 						key,
 						pushName,
@@ -370,8 +370,8 @@ export class BusinessStartupService extends ChannelStartupService {
 						owner: this.instance.name,
 						// source: getDevice(received.key.id),
 					};
-				} else if (received ?.messages[0].interactive && received ?.messages[0].interactive.type === "nfm_reply") {
-					const flow_response: any = received ?.messages[0].interactive.nfm_reply
+				} else if (received?.messages[0].interactive && received?.messages[0].interactive.type === "nfm_reply") {
+					const flow_response: any = received?.messages[0].interactive.nfm_reply
 					messageRaw = {
 						key,
 						pushName,
@@ -387,7 +387,7 @@ export class BusinessStartupService extends ChannelStartupService {
 						owner: this.instance.name,
 						// source: getDevice(received.key.id),
 					};
-				} else if (received ?.messages[0].interactive) {
+				} else if (received?.messages[0].interactive) {
 					messageRaw = {
 						key,
 						pushName,
@@ -399,7 +399,7 @@ export class BusinessStartupService extends ChannelStartupService {
 						owner: this.instance.name,
 						// source: getDevice(received.key.id),
 					};
-				} else if (received ?.messages[0].reaction) {
+				} else if (received?.messages[0].reaction) {
 					messageRaw = {
 						key,
 						pushName,
@@ -411,7 +411,7 @@ export class BusinessStartupService extends ChannelStartupService {
 						owner: this.instance.name,
 						// source: getDevice(received.key.id),
 					};
-				} else if (received ?.messages[0].type === "button") {
+				} else if (received?.messages[0].type === "button") {
 					messageRaw = {
 						key,
 						pushName,
@@ -423,7 +423,7 @@ export class BusinessStartupService extends ChannelStartupService {
 						owner: this.instance.name,
 						// source: getDevice(received.key.id),
 					};
-				} else if (received ?.messages[0].contacts) {
+				} else if (received?.messages[0].contacts) {
 					messageRaw = {
 						key,
 						pushName,
@@ -468,7 +468,7 @@ export class BusinessStartupService extends ChannelStartupService {
 						messageRaw,
 					);
 
-					if (chatwootSentMessage ?.id) {
+					if (chatwootSentMessage?.id) {
 						messageRaw.chatwoot = {
 							messageId: chatwootSentMessage.id,
 							inboxId: chatwootSentMessage.inbox_id,
@@ -477,7 +477,7 @@ export class BusinessStartupService extends ChannelStartupService {
 					}
 				}
 
-				const typebotSessionRemoteJid = this.localTypebot.sessions ?.find(
+				const typebotSessionRemoteJid = this.localTypebot.sessions?.find(
 					(session) => session.remoteJid === key.remoteJid,
 				);
 
@@ -492,7 +492,7 @@ export class BusinessStartupService extends ChannelStartupService {
 					}
 				}
 
-				if (this.localChamaai.enabled && messageRaw.key.fromMe === false && received ?.message.type === 'notify') {
+				if (this.localChamaai.enabled && messageRaw.key.fromMe === false && received?.message.type === 'notify') {
 					await this.chamaaiService.sendChamaai(
 						{ instanceName: this.instance.name },
 						messageRaw.key.remoteJid,
@@ -520,7 +520,7 @@ export class BusinessStartupService extends ChannelStartupService {
 					return;
 				}
 
-				if (contact ?.length) {
+				if (contact?.length) {
 					this.logger.verbose('Contact found in database');
 					const contactRaw: ContactRaw = {
 						id: received.contacts[0].profile.phone,
@@ -561,11 +561,11 @@ export class BusinessStartupService extends ChannelStartupService {
 						remoteJid: this.phoneNumber,
 						fromMe: this.phoneNumber === received.metadata.phone_number_id,
 					};
-					if (settings ?.groups_ignore && key.remoteJid.includes('@g.us')) {
+					if (settings?.groups_ignore && key.remoteJid.includes('@g.us')) {
 						this.logger.verbose('group ignored');
 						return;
 					}
-					if (key.remoteJid !== 'status@broadcast' && !key ?.remoteJid ?.match(/(:\d+)/)) {
+					if (key.remoteJid !== 'status@broadcast' && !key?.remoteJid?.match(/(:\d+)/)) {
 						this.logger.verbose('Message update is valid');
 
 						if (item.status === 'read' && !key.fromMe) return;
@@ -628,8 +628,8 @@ export class BusinessStartupService extends ChannelStartupService {
 	private convertMessageToRaw(message: any, content: any) {
 		let convertMessage: any;
 
-		if (message ?.conversation) {
-			if (content ?.context ?.message_id) {
+		if (message?.conversation) {
+			if (content?.context?.message_id) {
 				convertMessage = {
 					...message,
 					contextInfo: { stanzaId: content.context.message_id },
@@ -640,8 +640,8 @@ export class BusinessStartupService extends ChannelStartupService {
 			return convertMessage;
 		}
 
-		if (message ?.mediaType === 'image') {
-			if (content ?.context ?.message_id) {
+		if (message?.mediaType === 'image') {
+			if (content?.context?.message_id) {
 				convertMessage = {
 					imageMessage: message,
 					contextInfo: { stanzaId: content.context.message_id },
@@ -653,8 +653,8 @@ export class BusinessStartupService extends ChannelStartupService {
 			};
 		}
 
-		if (message ?.mediaType === 'video') {
-			if (content ?.context ?.message_id) {
+		if (message?.mediaType === 'video') {
+			if (content?.context?.message_id) {
 				convertMessage = {
 					videoMessage: message,
 					contextInfo: { stanzaId: content.context.message_id },
@@ -666,8 +666,8 @@ export class BusinessStartupService extends ChannelStartupService {
 			};
 		}
 
-		if (message ?.mediaType === 'audio') {
-			if (content ?.context ?.message_id) {
+		if (message?.mediaType === 'audio') {
+			if (content?.context?.message_id) {
 				convertMessage = {
 					audioMessage: message,
 					contextInfo: { stanzaId: content.context.message_id },
@@ -679,8 +679,8 @@ export class BusinessStartupService extends ChannelStartupService {
 			};
 		}
 
-		if (message ?.mediaType === 'document') {
-			if (content ?.context ?.message_id) {
+		if (message?.mediaType === 'document') {
+			if (content?.context?.message_id) {
 				convertMessage = {
 					documentMessage: message,
 					contextInfo: { stanzaId: content.context.message_id },
@@ -706,11 +706,11 @@ export class BusinessStartupService extends ChannelStartupService {
 		this.logger.verbose('Sending message with typing');
 		try {
 			let quoted: any;
-			const linkPreview = options ?.linkPreview != false ? undefined : false;
-			if (options ?.quoted) {
-				const m = options ?.quoted;
+			const linkPreview = options?.linkPreview != false ? undefined : false;
+			if (options?.quoted) {
+				const m = options?.quoted;
 
-				const msg = m ?.key;
+				const msg = m?.key;
 
 				if (!msg) {
 					throw 'Message not found';
@@ -841,7 +841,7 @@ export class BusinessStartupService extends ChannelStartupService {
 					quoted ? (content.context = { message_id: quoted.id }) : content;
 					let formattedText = '';
 					for (const item of message['buttons']) {
-						formattedText += `- ${item.reply ?.title}\n`;
+						formattedText += `- ${item.reply?.title}\n`;
 					}
 					message = { conversation: `${message['title']}\n${message['text'] || 'Select'}\n${message['footer']}\n` + formattedText };
 					return await this.post(content, 'messages');
@@ -874,11 +874,11 @@ export class BusinessStartupService extends ChannelStartupService {
 					quoted ? (content.context = { message_id: quoted.id }) : content;
 					let formattedText = '';
 					for (const section of message['sections']) {
-						formattedText += `- ${section ?.title}:\n`;
+						formattedText += `- ${section?.title}:\n`;
 						let index = 1;
 						for (const row of section.rows) {
-							formattedText += `\t- [${(row ?.id) ? row.id : index}] ${row ?.title}:\n`;
-							formattedText += `\t\t${row ?.description}\n`;
+							formattedText += `\t- [${(row?.id) ? row.id : index}] ${row?.title}:\n`;
+							formattedText += `\t\t${row?.description}\n`;
 							index += 1;
 						}
 					}
@@ -926,7 +926,7 @@ export class BusinessStartupService extends ChannelStartupService {
 				}
 			})();
 
-			if (messageSent ?.error ?.message) {
+			if (messageSent?.error?.message) {
 				this.logger.error(messageSent.error.message);
 				throw messageSent.error.message.toString();
 			}
@@ -934,11 +934,11 @@ export class BusinessStartupService extends ChannelStartupService {
 			console.log(content);
 
 			const messageRaw: MessageRaw = {
-				key: { fromMe: true, id: messageSent ?.messages[0] ?.id, remoteJid: this.createJid(number) },
+				key: { fromMe: true, id: messageSent?.messages[0]?.id, remoteJid: this.createJid(number) },
 				//pushName: messageSent.pushName,
 				message: this.convertMessageToRaw(message, content),
 				messageType: this.renderMessageType(metaCustom ? "conversation" : content.type),
-				messageTimestamp: (messageSent ?.messages[0] ?.timestamp as number) || Math.round(new Date().getTime() / 1000),
+				messageTimestamp: (messageSent?.messages[0]?.timestamp as number) || Math.round(new Date().getTime() / 1000),
 				owner: this.instance.name,
 				//ource: getDevice(messageSent.key.id),
 			};
@@ -974,7 +974,7 @@ export class BusinessStartupService extends ChannelStartupService {
 			{
 				conversation: data.textMessage.text,
 			},
-			data ?.options,
+			data?.options,
 			isChatwoot,
 		);
 		return res;
@@ -1026,38 +1026,36 @@ export class BusinessStartupService extends ChannelStartupService {
 			//   mediaMessage.fileName = 'video.mp4';
 			// }
 
-			let mimetype: string;
+			// let mimetype: string;
 
 			const prepareMedia: any = {
-				caption: mediaMessage ?.caption,
-				fileName: mediaMessage ?.fileName,
+				caption: mediaMessage?.caption,
+				fileName: mediaMessage?.fileName,
 				mediaType: mediaMessage.mediatype,
 				media: mediaMessage.media,
 				gifPlayback: false,
 			};
 
 			if (mediaMessage.mimetype) {
-				mimetype = mediaMessage.mimetype;
+				prepareMedia.mimetype = mediaMessage.mimetype;
+			} else if (isURL(mediaMessage.media)) {
+				prepareMedia.mimetype = getMIMEType(mediaMessage.media);
+				prepareMedia.id = mediaMessage.media;
+				prepareMedia.type = 'link';
 			} else {
-				if (isURL(mediaMessage.media)) {
-					mimetype = getMIMEType(mediaMessage.media);
-					prepareMedia.id = mediaMessage.media;
-					prepareMedia.type = 'link';
-				} else {
-					mimetype = getMIMEType(mediaMessage.fileName);
-					const id = await this.getIdMedia(prepareMedia);
-					prepareMedia.id = id;
-					prepareMedia.type = 'id';
-				}
+				prepareMedia.mimetype = getMIMEType(mediaMessage.fileName);
+				const id = await this.getIdMedia(prepareMedia);
+				prepareMedia.id = id;
+				prepareMedia.type = 'id';
 			}
 
-			prepareMedia.mimetype = mimetype;
+			// prepareMedia.mimetype = mimetype;
 
 			this.logger.verbose('Generating wa message from content');
 			return prepareMedia;
 		} catch (error) {
 			this.logger.error(error);
-			throw new InternalServerErrorException(error ?.toString() || error);
+			throw new InternalServerErrorException(error?.toString() || error);
 		}
 	}
 
@@ -1065,7 +1063,7 @@ export class BusinessStartupService extends ChannelStartupService {
 		this.logger.verbose('Sending media message');
 		const message = await this.prepareMediaMessage(data.mediaMessage);
 
-		return await this.sendMessageWithTyping(data.number, { ...message }, data ?.options, isChatwoot);
+		return await this.sendMessageWithTyping(data.number, { ...message }, data?.options, isChatwoot);
 	}
 
 	public async processAudio(audio: string, number: string) {
@@ -1104,7 +1102,7 @@ export class BusinessStartupService extends ChannelStartupService {
 
 		const message = await this.processAudio(data.audioMessage.audio, data.number);
 
-		return await this.sendMessageWithTyping(data.number, { ...message }, data ?.options, isChatwoot);
+		return await this.sendMessageWithTyping(data.number, { ...message }, data?.options, isChatwoot);
 	}
 
 	public async buttonMessage(data: SendButtonDto) {
@@ -1112,8 +1110,8 @@ export class BusinessStartupService extends ChannelStartupService {
 		const embeddedMedia: any = {};
 		let mediatype = 'TEXT';
 
-		if (data.buttonMessage ?.mediaMessage) {
-			mediatype = data.buttonMessage.mediaMessage ?.mediatype.toUpperCase() ?? 'TEXT';
+		if (data.buttonMessage?.mediaMessage) {
+			mediatype = data.buttonMessage.mediaMessage?.mediatype.toUpperCase() ?? 'TEXT';
 			embeddedMedia.mediaKey = mediatype.toLowerCase() + 'Message';
 			const generate = await this.prepareMediaMessage(data.buttonMessage.mediaMessage);
 			embeddedMedia.message = generate.message[embeddedMedia.mediaKey];
@@ -1132,9 +1130,9 @@ export class BusinessStartupService extends ChannelStartupService {
 		return await this.sendMessageWithTyping(
 			data.number,
 			{
-				title: data.buttonMessage ?.title,
-				text: !embeddedMedia ?.mediaKey ? data.buttonMessage.description : undefined,
-				footer: data.buttonMessage ?.footerText,
+				title: data.buttonMessage?.title,
+				text: !embeddedMedia?.mediaKey ? data.buttonMessage.description : undefined,
+				footer: data.buttonMessage?.footerText,
 				buttons: data.buttonMessage.buttons.map((button) => {
 					return {
 						type: 'reply',
@@ -1144,9 +1142,9 @@ export class BusinessStartupService extends ChannelStartupService {
 						},
 					};
 				}),
-				[embeddedMedia ?.mediaKey]: embeddedMedia ?.message,
+				[embeddedMedia?.mediaKey]: embeddedMedia?.message,
 			},
-			data ?.options,
+			data?.options,
 		);
 	}
 
@@ -1158,11 +1156,11 @@ export class BusinessStartupService extends ChannelStartupService {
 				locationMessage: {
 					degreesLatitude: data.locationMessage.latitude,
 					degreesLongitude: data.locationMessage.longitude,
-					name: data.locationMessage ?.name,
-					address: data.locationMessage ?.address,
+					name: data.locationMessage?.name,
+					address: data.locationMessage?.address,
 				},
 			},
-			data ?.options,
+			data?.options,
 		);
 	}
 
@@ -1171,7 +1169,7 @@ export class BusinessStartupService extends ChannelStartupService {
 		return await this.sendMessageWithTyping(
 			data.number,
 			data,
-			data ?.options,
+			data?.options,
 		);
 	}
 
@@ -1190,8 +1188,8 @@ export class BusinessStartupService extends ChannelStartupService {
 			{
 				title: data.listMessage.title,
 				text: data.listMessage.description,
-				footerText: data.listMessage ?.footerText,
-				buttonText: data.listMessage ?.buttonText,
+				footerText: data.listMessage?.footerText,
+				buttonText: data.listMessage?.buttonText,
 				sections: data.listMessage.sections.map((section) => {
 					return {
 						title: section.title,
@@ -1205,7 +1203,7 @@ export class BusinessStartupService extends ChannelStartupService {
 					};
 				}),
 			},
-			data ?.options,
+			data?.options,
 		);
 	}
 
@@ -1220,7 +1218,7 @@ export class BusinessStartupService extends ChannelStartupService {
 					components: data.templateMessage.components,
 				},
 			},
-			data ?.options,
+			data?.options,
 			isChatwoot,
 		);
 		return res;
@@ -1290,7 +1288,7 @@ export class BusinessStartupService extends ChannelStartupService {
 				}),
 				message,
 			},
-			data ?.options,
+			data?.options,
 		);
 	}
 
@@ -1314,14 +1312,14 @@ export class BusinessStartupService extends ChannelStartupService {
 			this.logger.verbose('Media message downloaded');
 			return {
 				mediaType: msg.messageType,
-				fileName: mediaMessage ?.fileName,
-				caption: mediaMessage ?.caption,
+				fileName: mediaMessage?.fileName,
+				caption: mediaMessage?.caption,
 				size: {
-					fileLength: mediaMessage ?.fileLength,
-					height: mediaMessage ?.fileLength,
-					width: mediaMessage ?.width,
+					fileLength: mediaMessage?.fileLength,
+					height: mediaMessage?.fileLength,
+					width: mediaMessage?.width,
 				},
-				mimetype: mediaMessage ?.mime_type,
+				mimetype: mediaMessage?.mime_type,
 				base64: msg.message.base64,
 			};
 		} catch (error) {
