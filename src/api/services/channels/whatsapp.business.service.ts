@@ -796,7 +796,7 @@ export class BusinessStartupService extends ChannelStartupService {
 							caption: message['caption']
 						},
 					};
-					message['fileName'] ? content[message['mediaType']].filename = message['fileName'] : content;
+					message['fileName'] && message['mediaType'] !== 'audio' ? content[message['mediaType']].filename = message['fileName'] : content;
 					quoted ? (content.context = { message_id: quoted.id }) : content;
 					return await this.post(content, 'messages');
 				}
