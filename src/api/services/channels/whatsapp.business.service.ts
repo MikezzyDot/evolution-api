@@ -995,12 +995,11 @@ export class BusinessStartupService extends ChannelStartupService {
 		});
 		formData.append('typeFile', mediaMessage.mimetype);
 		formData.append('messaging_product', 'whatsapp');
+		let urlServer = this.configService.get<WaBusiness>('WA_BUSINESS').URL;
+		const version = this.configService.get<WaBusiness>('WA_BUSINESS').VERSION;
+		urlServer = `${urlServer}/${version}/${integration.number}/media`;
 		const headers = { Authorization: `Bearer ${integration.token}` };
-		const res = await axios.post(
-			process.env.API_URL + '/' + process.env.VERSION + '/' + integration.number + '/media',
-			formData,
-			{ headers },
-		);
+		const res = await axios.post(urlServer, formData, { headers });
 		return res.data.id;
 	}
 
