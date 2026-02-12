@@ -1036,18 +1036,19 @@ export class BusinessStartupService extends ChannelStartupService {
 				gifPlayback: false,
 			};
 
-			if (mediaMessage.mimetype) {
-				prepareMedia.mimetype = mediaMessage.mimetype;
-			} else if (isURL(mediaMessage.media)) {
-				prepareMedia.mimetype = getMIMEType(mediaMessage.media);
+
+
+			if (isURL(mediaMessage.media)) {
+				prepareMedia.mimetype = (mediaMessage.mimetype) ? mediaMessage.mimetype : getMIMEType(mediaMessage.media);
 				prepareMedia.id = mediaMessage.media;
 				prepareMedia.type = 'link';
 			} else {
-				prepareMedia.mimetype = getMIMEType(mediaMessage.fileName);
+				prepareMedia.mimetype = (mediaMessage.mimetype) ? mediaMessage.mimetype : getMIMEType(mediaMessage.fileName);
 				const id = await this.getIdMedia(prepareMedia);
 				prepareMedia.id = id;
 				prepareMedia.type = 'id';
 			}
+
 
 			// prepareMedia.mimetype = mimetype;
 
